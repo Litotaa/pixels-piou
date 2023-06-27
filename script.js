@@ -1,8 +1,8 @@
 const colorsChoice = document.querySelector('#colorsChoice')
 const game = document.querySelector('#game')
 const cursor = document.querySelector('#cursor')
-game.width = 1200
-game.height = 600
+game.width = 1500
+game.height = 1200
 const gridCellSize = 10
 
 
