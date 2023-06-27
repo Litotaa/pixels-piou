@@ -17,16 +17,16 @@ const colorList=[
 ]
 let currentColorChoice = colorList[9]
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAHpEbsvrTgtkTK3j_8QQufLS9LILfWbhk",
-    authDomain: "pixels-piou.firebaseapp.com",
-    projectId: "pixels-piou",
-    storageBucket: "pixels-piou.appspot.com",
-    messagingSenderId: "50634291732",
-    appId: "1:50634291732:web:e8d0fdf97f69029403c501"
-  };
-firebase.initializeApp(firebaseConfig)
-const db = firebase.firestore()
+// const firebaseConfig = {
+//     apiKey: "AIzaSyAHpEbsvrTgtkTK3j_8QQufLS9LILfWbhk",
+//     authDomain: "pixels-piou.firebaseapp.com",
+//     projectId: "pixels-piou",
+//     storageBucket: "pixels-piou.appspot.com",
+//     messagingSenderId: "50634291732",
+//     appId: "1:50634291732:web:e8d0fdf97f69029403c501"
+//   };
+// firebase.initializeApp(firebaseConfig)
+// const db = firebase.firestore()
 
 colorList.forEach(color=> {
     const colorItem = document.createElement('div')
@@ -35,7 +35,6 @@ colorList.forEach(color=> {
 
     colorItem.addEventListener('click', () =>{
         currentColorChoice = color
-        console.log(currentColorChoice)
 
         colorItem.innerHTML = `<i class="fa-solid fa-check"></i>`
 
@@ -56,16 +55,20 @@ function addPixelIntoGame(){
     const x = cursor.offsetLeft
     const y = cursor.offsetTop - game.offsetTop
 
-    createPixel(x, y, currentColorChoice)
-
-    const pixel= {
-        x,
-        y,
-        color: currentColorChoice
-    }
-
-    const pixelRef = db.collection('pixels').doc(`${pixel.x}-${pixel.y}`)
-    pixelRef.set(pixel, {merge: true})
+    $.ajax({
+        url: "https://ze9sdfdqfa.execute-api.eu-west-1.amazonaws.com/dev/pixels",
+        type: "PUT",
+        dataType: 'json',
+        crossDomain: true ,
+        contentType:'application/json',
+        async:true,
+        data: JSON.stringify({"x": x, "y": y, "color": currentColorChoice}),
+        success: function (response) {
+            createPixel(x, y, currentColorChoice)
+        },
+    })
+    // const pixelRef = db.collection('pixels').doc(`${pixel.x}-${pixel.y}`)
+    // pixelRef.set(pixel, {merge: true})
 
 }
 cursor.addEventListener('click', function(event){
@@ -90,27 +93,82 @@ function drawGrids(ctx, width, height, cellWidth, cellHeight){
     }
 
     ctx.stroke()
+
+    setInterval(function(){ 
+        $.ajax({
+            url: "https://ze9sdfdqfa.execute-api.eu-west-1.amazonaws.com/dev/pixels",
+            dataType: 'json',
+            crossDomain: true,
+            contentType:'application/json',
+            async:true,
+            success: function (response) {
+                response.forEach(function(pixel){
+                    createPixel(pixel['x'], pixel['y'], pixel['color'])
+                })
+            },
+        })
+    }, 1000);
 }
 
-drawGrids(gridCtx,game.width, game.height, gridCellSize, gridCellSize)
+
 
 game.addEventListener('mousemove', function(event){
-    console.log("x:", event.clientX)
-    console.log("y:", event.clientY)
+    // console.log("x:", event.clientX)
+    // console.log("y:", event.clientY)
 
     const cursorLeft = event.clientX - (cursor.offsetWidth/2)
-    const cursorTop = event.clientY - (cursor.offsetHeight/2)
+    const cursorTop = event.clientY - (cursor.offsetHeight/2) - game.offsetTop
 
     cursor.style.left = Math.floor(cursorLeft/gridCellSize)*gridCellSize +"px"
-    cursor.style.top = Math.floor(cursorTop/gridCellSize)*gridCellSize +"px"
+    cursor.style.top = game.offsetTop + Math.floor(cursorTop/gridCellSize)*gridCellSize +"px"
 })
 
 
-db.collection('pixels').onSnapshot(function(querySnapshot){
-    querySnapshot.docChanges().forEach(function(change){
-        console.log(change.doc.data())
-        const{x, y, color}=change.doc.data()
+// db.collection('pixels').onSnapshot(function(querySnapshot){
+//     querySnapshot.docChanges().forEach(function(change){
+//         console.log(change.doc.data())
+//         const{x, y, color}=change.doc.data()
 
-        createPixel(x, y, color)
-    })
+//         createPixel(x, y, color)
+//     })
+// })
+
+
+$.ajax({
+    url: "https://ze9sdfdqfa.execute-api.eu-west-1.amazonaws.com/dev/users",
+    dataType: 'json',
+    crossDomain: true ,
+    contentType:'application/json',
+    async:true,
+    success: function (response) {
+        $('#welcome').html('Welcome back, ' + response["pseudo"])
+        drawGrids(gridCtx,game.width, game.height, gridCellSize, gridCellSize)
+    },
+    error: function (xhr, ajaxOptions, thrownError) {
+        $('<form>Quel est ton pseudo ?<input type="text" style="z-index:10000" name="name"><br></form>').dialog({
+            modal: true,
+            buttons: {
+                'OK': function () {
+                    var pseudo = $('input[name="name"]').val();
+                    $.ajax({
+                        url: "https://ze9sdfdqfa.execute-api.eu-west-1.amazonaws.com/dev/users",
+                        type: "PUT",
+                        dataType: 'json',
+                        crossDomain: true ,
+                        contentType:'application/json',
+                        async:true,
+                        data: JSON.stringify({"pseudo": pseudo}),
+                        success: function (response) {
+                            $('#welcome').html('Welcome, ' + pseudo)
+                            drawGrids(gridCtx, game.width, game.height, gridCellSize, gridCellSize)
+                        },
+                    })
+                    $(this).dialog('close');
+                }
+            }
+        });
+    }
 })
+
+
+
