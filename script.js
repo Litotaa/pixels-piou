@@ -13,19 +13,10 @@ const ctx = game.getContext('2d');
 const gridCtx = game.getContext('2d');
 
 const colorList=[
-    "#000000", "#808080", "#A9A9A9", "#D3D3D3", "#F5F5F5", "#FFFFFF", "#FFFFF0", "#FFFAF0",
-    "#FFF0F5", "#FFE4E1", "#FFC0CB", "#FF69B4", "#FF1493", "#DB7093", "#FF00FF", "#C71585", 
-    "#D8BFD8", "#DDA0DD", "#EE82EE", "#DA70D6", "#BA55D3", "#9932CC", "#8A2BE2", "#4B0082", 
-    "#7B68EE", "#6A5ACD", "#9370DB", "#8B008B", "#800080", "#BC8F8F", "#F08080", "#FF7F50", 
-    "#FF6347", "#FF4500", "#FF0000", "#DC143C", "#FFA07A", "#E9967A", "#FA8072", "#B22222", 
-    "#A52A2A", "#8B0000", "#800000", "#F5F5DC", "#FFE4C4", "#FFDAB9", "#FFE4B5", "#FFDEAD", 
-    "#F5DEB3", "#DEB887", "#D2B48C", "#F4A460", "#FFA500", "#FF8C00", "#D2691E", "#CD853F", 
-    "#A0522D", "#8B4513", "#FFFFE0", "#FFF8DC", "#FAFAD2", "#FFFACD", "#EEE8AA", "#F0E68C", 
-    "#FFFF00", "#FFD700", "#DAA520", "#B8860B", "#BDB76B", "#9ACD32", "#6B8E23", "#808000", 
-    "#556B2F", "#ADFF2F", "#7FFF00", "#7CFC00", "#00FF00", "#32CD32", "#F5FFFA", "#3CB371", 
-    "#2E8B57", "#778899", "#7FFFD4", "#00FFFF", "#40E0D0", "#20B2AA", "#008B8B", "#B0E0E6", 
-    "#87CEFA", "#00BFFF", "#1E90FF", "#E6E6FA", "#B0C4DE", "#6495ED", "#4682B4", "#0000FF", 
-    "#0000CD", "#191970"
+    "#000000", "#808080", "#A9A9A9", "#D3D3D3", "#F5F5F5", "#FFFFFF", "#FFFAF0", "#FFF0F5", "#FFE4E1", "#FFC0CB", "#FF69B4", "#FF1493", "#DB7093", "#FF00FF", "#C71585", "#D8BFD8", "#DDA0DD", "#EE82EE", "#DA70D6", "#BA55D3", "#9932CC", "#8A2BE2", "#4B0082", "#7B68EE", "#6A5ACD", "#9370DB", 
+    "#8B008B", "#BC8F8F", "#F08080", "#FF7F50", "#FF6347", "#DC143C", "#FFA07A", "#E9967A", "#FA8072", "#B22222", "#8B0000", "#F5F5DC", "#FFE4C4", "#F5DEB3", "#DEB887", "#F4A460", "#FFA500", "#FF8C00", "#D2691E", "#CD853F", "#A0522D", "#8B4513", "#FFFFE0", "#FFFACD", "#FFFF00", "#FFD700", 
+    "#DAA520", "#B8860B", "#BDB76B", "#9ACD32", "#6B8E23", "#808000", "#556B2F", "#ADFF2F", "#7CFC00", "#F5FFFA", "#3CB371", "#2E8B57", "#778899", "#7FFFD4", "#00FFFF", "#40E0D0", "#20B2AA", "#008B8B", "#B0E0E6", "#87CEFA", "#00BFFF", "#1E90FF", "#E6E6FA", "#B0C4DE", "#6495ED", 
+    "#4682B4", "#0000FF", "#0000CD", "#191970"
 ]
 let currentColorChoice = colorList[9]
 
