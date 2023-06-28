@@ -23,14 +23,17 @@ h1 {
   height: 600px;
   box-shadow: 1px 1px 10px -5px rgba(0, 0, 0, 0.5);
   cursor: none;
+  display: none;
 }
 
 #colorsChoice {
   position: fixed;
   right: 30px;
-  top: 170px;
+  top: 50px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  max-width: 50%;
 }
 #colorsChoice div {
   background-color: #ff5a5f;
@@ -60,3 +63,8 @@ h1 {
   border: 1px solid #000000;
   cursor: none;
 }/*# sourceMappingURL=style.css.map */
+
+#pixel_pseudo {
+  margin: 0;
+  padding: 0;
+}
