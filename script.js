@@ -6,6 +6,7 @@ game.height = 600
 const gridCellSize = 10
 
 let pixels_dict = {};
+const initial_cooldown = 5;
 let cooldown = 0;
 
 
@@ -35,8 +36,8 @@ function addPixelIntoGame(){
     const y = cursor.offsetTop - game.offsetTop
     createPixel(x, y, currentColorChoice, sessionStorage.getItem("pseudo"))
 
-    cooldown = 10
-    document.getElementById("cooldown").innerHTML = 10;
+    cooldown = initial_cooldown
+    document.getElementById("cooldown").innerHTML = initial_cooldown;
     var cooldownTimer = setInterval(function(){
         cooldown -= 1;
         if(cooldown <= 0){
