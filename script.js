@@ -1,3 +1,5 @@
+let websocket = null;
+
 const colorsChoice = document.querySelector('#colorsChoice')
 const game = document.querySelector('#game')
 const cursor = document.querySelector('#cursor')
@@ -47,24 +49,13 @@ function addPixelIntoGame(){
         document.getElementById("cooldown").innerHTML = cooldown;
     }, 1000);
 
-    $.ajax({
-        url: "https://ze9sdfdqfa.execute-api.eu-west-1.amazonaws.com/api/pixels",
-        type: "PUT",
-        dataType: 'json',
-        crossDomain: true ,
-        contentType:'application/json',
-        async:true,
-        data: JSON.stringify({"x": x, "y": y, "color": currentColorChoice, "pseudo": sessionStorage.getItem("pseudo")}),
-        error: function (xhr, ajaxOptions, thrownError) {
-            if (xhr.status == 403){
-                alert("Cooldown en cours")
-                ctx.beginPath()
-                ctx.fillStyle = "#FFFFFF"
-                ctx.fillRect(x, y,gridCellSize, gridCellSize)
-                delete pixels_dict[x + "_" + y]
-            }
-        }
-    })
+    websocket.send(JSON.stringify({
+        "action": "editPixel",
+        "x": x, 
+        "y": y, 
+        "color": currentColorChoice, 
+        "pseudo": sessionStorage.getItem("pseudo")
+    }));
 
 }
 
@@ -97,75 +88,67 @@ function drawGrids(ctx, width, height, cellWidth, cellHeight){
             })
         },
     })
-
-    setInterval(function(){ 
-        $.ajax({
-            url: "https://ze9sdfdqfa.execute-api.eu-west-1.amazonaws.com/api/pixels",
-            dataType: 'json',
-            crossDomain: true,
-            contentType:'application/json',
-            async:true,
-            success: function (response) {
-                response.forEach(function(pixel){
-                    createPixel(pixel['x'], pixel['y'], pixel['color'], pixel["pseudo"])
-                })
-            },
-        })
-    }, 1000);
 }
 
 function startPixelPiou(){
-    game.style.display = "block";
-    drawGrids(gridCtx, game.width, game.height, gridCellSize, gridCellSize)
-    colorList.forEach(color=> {
-        const colorItem = document.createElement('div')
-        colorItem.style.backgroundColor = color
-        colorsChoice.appendChild(colorItem)
-    
-        colorItem.addEventListener('click', () =>{
-            currentColorChoice = color
-    
-            colorItem.innerHTML = `<i class="fa-solid fa-check"></i>`
-    
-            setTimeout(()=> {
-                colorItem.innerHTML=""
-            }, 1000)
+    websocket = new WebSocket("wss://pp7my7mm6i.execute-api.eu-west-1.amazonaws.com/api");
+    websocket.onopen = (event) => {
+        websocket.onmessage = (event) => {
+            pixel = JSON.parse(event.data)
+            console.log(pixel);
+            createPixel(pixel['x'], pixel['y'], pixel['color'], pixel["pseudo"])
+        };
+        game.style.display = "block";
+        drawGrids(gridCtx, game.width, game.height, gridCellSize, gridCellSize)
+        colorList.forEach(color=> {
+            const colorItem = document.createElement('div')
+            colorItem.style.backgroundColor = color
+            colorsChoice.appendChild(colorItem)
+        
+            colorItem.addEventListener('click', () =>{
+                currentColorChoice = color
+        
+                colorItem.innerHTML = `<i class="fa-solid fa-check"></i>`
+        
+                setTimeout(()=> {
+                    colorItem.innerHTML=""
+                }, 1000)
+            })
         })
-    
-    })
-    cursor.addEventListener('click', function(event){
-        addPixelIntoGame()
-    })
-    game.addEventListener('click', function(){
-        addPixelIntoGame()
-    })
-    game.addEventListener('mousemove', function(event){
-        const cursorLeft = event.pageX - (cursor.offsetWidth/2)
-        let cursorTop = event.pageY - (cursor.offsetHeight/2) - game.offsetTop
-    
-        if (cursorTop < 0){
-            cursorTop = 0
-        }
-    
-        cursor.style.left = Math.floor(cursorLeft/gridCellSize)*gridCellSize + "px"
-        cursor.style.top = game.offsetTop + Math.floor(cursorTop/gridCellSize)*gridCellSize + "px"
-    
-        const x = cursor.offsetLeft
-        const y = cursor.offsetTop - game.offsetTop
-    
-        var key = x + "_" + y
-        var tooltip = document.querySelector('#pixel_pseudo');
-        if (key in pixels_dict){
-            tooltip.innerHTML = pixels_dict[key]["pseudo"]
-            tooltip.style.display = "block";
-            tooltip.style.position = "absolute";
-            tooltip.style.left = Math.floor(cursorLeft/gridCellSize)*gridCellSize + gridCellSize + "px";
-            tooltip.style.top =  game.offsetTop + Math.floor(cursorTop/gridCellSize)*gridCellSize - tooltip.offsetHeight + "px";
-        }
-        else{
-            tooltip.style.display = "none";
-        }
-    })
+        cursor.addEventListener('click', function(event){
+            addPixelIntoGame()
+        })
+        game.addEventListener('click', function(){
+            addPixelIntoGame()
+        })
+        game.addEventListener('mousemove', function(event){
+            const cursorLeft = event.pageX - (cursor.offsetWidth/2)
+            let cursorTop = event.pageY - (cursor.offsetHeight/2) - game.offsetTop
+        
+            if (cursorTop < 0){
+                cursorTop = 0
+            }
+        
+            cursor.style.left = Math.floor(cursorLeft/gridCellSize)*gridCellSize + "px"
+            cursor.style.top = game.offsetTop + Math.floor(cursorTop/gridCellSize)*gridCellSize + "px"
+        
+            const x = cursor.offsetLeft
+            const y = cursor.offsetTop - game.offsetTop
+        
+            var key = x + "_" + y
+            var tooltip = document.querySelector('#pixel_pseudo');
+            if (key in pixels_dict){
+                tooltip.innerHTML = pixels_dict[key]["pseudo"]
+                tooltip.style.display = "block";
+                tooltip.style.position = "absolute";
+                tooltip.style.left = Math.floor(cursorLeft/gridCellSize)*gridCellSize + gridCellSize + "px";
+                tooltip.style.top =  game.offsetTop + Math.floor(cursorTop/gridCellSize)*gridCellSize - tooltip.offsetHeight + "px";
+            }
+            else{
+                tooltip.style.display = "none";
+            }
+        })
+    };
 }
 
 
