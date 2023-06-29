@@ -110,7 +110,7 @@ function drawGrids(ctx, width, height, cellWidth, cellHeight){
                 })
             },
         })
-    }, 10000);
+    }, 5000);
 }
 
 function startPixelPiou(){
