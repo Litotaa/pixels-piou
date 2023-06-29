@@ -95,7 +95,6 @@ function startPixelPiou(){
     websocket.onopen = (event) => {
         websocket.onmessage = (event) => {
             pixel = JSON.parse(event.data)
-            console.log(pixel);
             createPixel(pixel['x'], pixel['y'], pixel['color'], pixel["pseudo"])
         };
         game.style.display = "block";
