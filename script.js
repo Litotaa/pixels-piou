@@ -179,6 +179,9 @@ if (pseudo == null){
         buttons: {
             'OK': function () {
                 pseudo = $('input[name="name"]').val();
+                if (pseudo == ""){
+                    return;
+                }
                 sessionStorage.setItem("pseudo", pseudo);
                 $('#welcome').html('Welcome, ' + pseudo);
                 startPixelPiou();
