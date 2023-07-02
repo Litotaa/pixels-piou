@@ -11,6 +11,7 @@ let pixels_dict = {};
 const initial_cooldown = 5;
 let cooldown = 0;
 
+let pixels_to_check = {};
 
 const ctx = game.getContext('2d');
 const gridCtx = game.getContext('2d');
@@ -37,6 +38,14 @@ function addPixelIntoGame(){
     const x = cursor.offsetLeft
     const y = cursor.offsetTop - game.offsetTop
     createPixel(x, y, currentColorChoice, sessionStorage.getItem("pseudo"))
+    pixels_to_check[x + "_" + y] = {
+        "color": currentColorChoice,
+        "pseudo": sessionStorage.getItem("pseudo"),
+        "timeout": setTimeout(function(){
+            alert("Vous avez été déconnecté.");
+            location.reload();
+        }, 10000),
+    };
 
     cooldown = initial_cooldown
     document.getElementById("cooldown").innerHTML = initial_cooldown;
@@ -92,9 +101,23 @@ function drawGrids(ctx, width, height, cellWidth, cellHeight){
 
 function startPixelPiou(){
     websocket = new WebSocket("wss://pp7my7mm6i.execute-api.eu-west-1.amazonaws.com/api");
+    websocket.onclose = function (event) {
+        alert("Vous avez été déconnecté.");
+        location.reload();
+    };
     websocket.onopen = (event) => {
         websocket.onmessage = (event) => {
             pixel = JSON.parse(event.data)
+            let pos = pixel['x'] + "_" + pixel['y'];
+            if (
+                pos in pixels_to_check && 
+                pixels_to_check[pos]["color"] == pixel["color"] && 
+                pixels_to_check[pos]["pseudo"] == pixel["pseudo"]
+            ){
+                clearTimeout(pixels_to_check[pos]["timeout"]);
+                delete pixels_to_check[pos];
+                return;
+            }
             createPixel(pixel['x'], pixel['y'], pixel['color'], pixel["pseudo"])
         };
         game.style.display = "block";
